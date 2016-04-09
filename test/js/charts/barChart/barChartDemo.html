@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	 <head>
+		<meta charset="UTF-8">
+	</head> 
+	<body>
+		<p> look for d3.min.js in source </p>
+		<style>
+		.bar{
+			fill: steelblue;
+		}
+		</style>
+		<script type="text/javascript" src="../../lib/d3.min.js"></script>
+		<script type="text/javascript" src="barChart.js"></script>
+		<script type="text/javascript">
+			var data= [
+			{name:"A",freq: 17},
+			{name:"B",freq: 7},
+			{name:"C",freq: 3},
+			{name:"D",freq: 10},
+			{name:"E",freq: 20},
+			{name:"F",freq: 6},
+			];
+			// var chart = new BarChart();
+			
+			
+			// chart.setData(data,key,value );
+			// chart.setBarClass("bar");
+			// chart.data = data;
+			// chart.key = function(d){return d.name;};
+			// chart.value =  function(d){return d.freq;};
+			var chart = new BarChart(data, function key(d){return d.name;}, function(d){return d.freq;}, "random");
+			chart.setBarClass("bar");
+			chart.draw(10,10,400, 200);
+		</script>
+	</body>
+</html>
