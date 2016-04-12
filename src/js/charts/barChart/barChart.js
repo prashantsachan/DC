@@ -1,36 +1,80 @@
 var BarChart  = function(dataSet, keyGetter, valGetter){
-	this.dataset = dataSet ; // elements of format: key:<name>, value:<val>
+	var dataset = dataSet ; // elements of format: key:<name>, value:<val>
 	var keyGet = keyGetter ;
 	var valGet = valGetter;
-	this.barClass;
-	
+	// exposed elements
+	var xScale ;//= getXScale(width);
+	var yScale ;//= getYScale(height);
+	var xAxis;
+	var yAxis;
+	var selections = {};
 
-	this.setBarClass = function(barCssClass){
-		this.barClass = barCssClass;
-	}
-	this.draw = function (xStart,yStart,width, height){
-		this.drawBars(xStart,yStart,width, height);
+	this.getXScale = function(){return xScale;};
+	this.getYScale = function(){return yScale;};
+	this.getXAxis = function(){return xAxis;};
+	this.getYAxis = function(){return yAxis;};
+
+	this.getSelection = function (name){return selections[name]};
+	this.createSvg = function (width, height, xStart, yStart){
+		// var svg =  document.createElementNS(d3.ns.prefix.svg, 'svg');
+
+		// svg.setAttribute("width", width);
+		// svg.setAttribute("height", height);
+		// svg.setAttribute("transform","translate("+xStart+","+yStart+")");
+		// return svg;
+		selections['svg'] = d3.select("body").append("svg")
+			.attr("width", width)
+			.attr("height", height)
+			.attr("transform", "translate("+xStart+","+yStart+")");
+		
 	}
 
-	this.drawBars = function (xStart,yStart,width, height){
-		var x  = d3.scale.ordinal()
-				.domain(this.dataset.map(keyGet))
-				.rangeRoundBands([0,width], 0.1);
-		var maxY = d3.max(this.dataset, function(d){return valGet(d);});
-		var y = d3.scale.linear()
+	function getXScale( maxWidth){
+		return  d3.scale.ordinal()
+				.domain(dataset.map(keyGet))
+				.rangeRoundBands([0,maxWidth], 0.1);
+	}
+	function getYScale( maxHeight){
+		var maxY = d3.max(dataset, function(d){return valGet(d);});
+		return d3.scale.linear()
 				.domain([0,maxY])
-				.range([height,0]);
-		var svg = d3.select("body").append("svg")
-					.attr("width", width)
-					.attr("height", height)
-					.attr("transform","translate("+xStart+","+yStart+")");
-		svg.selectAll(this.barClass)
-		.data(this.dataset)
-		.enter().append("rect")
-		.attr("class", this.barClass)
-		.attr("x", function(d){return x(keyGet(d));})
-		.attr("y", function(d){return y(valGet(d));})
-		.attr("width", x.rangeBand())
-		.attr("height", function(d){return height-y(valGet(d));});
+				.range([maxHeight,0]);
 	}
+	
+	this.createBars = function (barClass, lMargin, rMargin, tMargin,bMargin){
+		var maxHeight = parseInt(selections['svg'].style("height").replace("px", "")) - tMargin -bMargin;
+		var maxWidth = parseInt(selections['svg'].style("width").replace("px", "")) - lMargin - rMargin;
+		xScale = getXScale(maxWidth);
+		yScale = getYScale(maxHeight);
+		selections['bars'] = selections['svg']
+				.selectAll(barClass)
+				.data(dataset)
+				.enter().append("rect");
+		selections['bars']
+			.attr("x", function(d){return lMargin+ xScale(keyGet(d));})
+			.attr("y", function(d){return tMargin + yScale(valGet(d));})
+			.attr("width", xScale.rangeBand())
+			.attr("height", function(d){return maxHeight- yScale(valGet(d));});
+		// bars rects;
+	}
+	this.colorBarsRandom = function(){
+		var color = d3.scale.category10()
+			.domain(dataset, function(d){return keyGet(d);});
+		selections['bars'].attr("fill",  function(d){return color(keyGet(d));});
+	}
+	this.createXAxis = function (lMargin, tMargin){
+		xAxis = d3.svg.axis()
+		.scale(xScale)
+		.orient("bottom");
+		selections['xAxis'] =selections['svg'].append("g").call(xAxis)
+		.attr("transform","translate("+lMargin+","+tMargin+")"); 
+	}
+	this.createYAxis = function (lMargin, tMargin){
+		yAxis =  d3.svg.axis()
+		.scale(yScale)
+		.orient("right");
+		selections['yAxis'] = selections['svg'].append("g").call(yAxis)
+		.attr("transform","translate("+lMargin+","+tMargin+")");
+	}
+
 }

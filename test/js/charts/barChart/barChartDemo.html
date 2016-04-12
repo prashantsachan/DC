@@ -7,11 +7,25 @@
 		<p> look for d3.min.js in source </p>
 		<style>
 		.bar{
-			fill: steelblue;
-		}
+			/*fill: steelblue;*/
+			stroke:black;
+			stroke-width:5;
+			opacity:1.0		}
+			.axis path,
+			.axis line {
+			    fill: none;
+			    stroke: black;
+			    shape-rendering: crispEdges;
+			}
+
+			.axis text {
+			    font-family: sans-serif;
+			    font-size: 11px;
+			}
 		</style>
-		<script type="text/javascript" src="../../lib/d3.min.js"></script>
-		<script type="text/javascript" src="barChart.js"></script>
+		<script type="text/javascript" src="../../../../lib/js/d3.js"></script>
+		<script type="text/javascript" src="../../../../src/js/charts/barChart/
+barChart.js"></script>
 		<script type="text/javascript">
 			var data= [
 			{name:"A",freq: 17},
@@ -21,17 +35,20 @@
 			{name:"E",freq: 20},
 			{name:"F",freq: 6},
 			];
-			// var chart = new BarChart();
-			
-			
-			// chart.setData(data,key,value );
-			// chart.setBarClass("bar");
-			// chart.data = data;
-			// chart.key = function(d){return d.name;};
-			// chart.value =  function(d){return d.freq;};
-			var chart = new BarChart(data, function key(d){return d.name;}, function(d){return d.freq;}, "random");
-			chart.setBarClass("bar");
-			chart.draw(10,10,400, 200);
+			var chart = new BarChart(data, function key(d){return d.name;}, function(d){return d.freq;});
+			chart.createSvg(400, 200, 0, 0);
+			// chart.initScales();
+			chart.createBars("bar",20,20,20,20);
+			chart.createXAxis(20, 180);
+			chart.createYAxis(0,20);
+
+			// console.log("chart has following bars: "+chart.bars)
+			// chart.getBars().attr("class", "bar");
+			chart.colorBarsRandom();
+			chart.getSelection('xAxis').attr("class", "axis");
+			chart.getSelection('yAxis').attr("class", "axis");
+			chart.getXAxis().orient("top");
+			// chart.draw(d3.select("body"));
 		</script>
 	</body>
 </html>
