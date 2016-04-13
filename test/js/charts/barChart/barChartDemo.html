@@ -11,16 +11,16 @@
 			stroke:black;
 			stroke-width:5;
 			opacity:1.0		}
-			.axis path,
-			.axis line {
-			    fill: none;
-			    stroke: black;
-			    shape-rendering: crispEdges;
+		.axis path,
+		.axis line {
+		    fill: none;
+		    stroke: black;
+		    shape-rendering: crispEdges;
 			}
 
-			.axis text {
-			    font-family: sans-serif;
-			    font-size: 11px;
+		.axis text {
+		    font-family: sans-serif;
+		    font-size: 11px;
 			}
 		</style>
 		<script type="text/javascript" src="../../../../lib/js/d3.js"></script>
@@ -42,13 +42,13 @@ barChart.js"></script>
 			chart.createXAxis(20, 180);
 			chart.createYAxis(0,20);
 
-			// console.log("chart has following bars: "+chart.bars)
-			// chart.getBars().attr("class", "bar");
 			chart.colorBarsRandom();
 			chart.getSelection('xAxis').attr("class", "axis");
 			chart.getSelection('yAxis').attr("class", "axis");
-			chart.getXAxis().orient("top");
-			// chart.draw(d3.select("body"));
+			// to change axes orientation,
+			// chart.getYAxis().orient("left");
+			chart.draw();
+
 		</script>
 	</body>
 </html>

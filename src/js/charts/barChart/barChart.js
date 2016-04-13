@@ -7,7 +7,7 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 	var yScale ;//= getYScale(height);
 	var xAxis;
 	var yAxis;
-	var selections = {};
+	var selections = {};// 'svg', 'bars', 'xAxis', 'yAxis'
 
 	this.getXScale = function(){return xScale;};
 	this.getYScale = function(){return yScale;};
@@ -15,6 +15,7 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 	this.getYAxis = function(){return yAxis;};
 
 	this.getSelection = function (name){return selections[name]};
+
 	this.createSvg = function (width, height, xStart, yStart){
 		// var svg =  document.createElementNS(d3.ns.prefix.svg, 'svg');
 
@@ -23,11 +24,12 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 		// svg.setAttribute("transform","translate("+xStart+","+yStart+")");
 		// return svg;
 		selections['svg'] = d3.select("body").append("svg")
+			.remove()
 			.attr("width", width)
 			.attr("height", height)
 			.attr("transform", "translate("+xStart+","+yStart+")");
 		
-	}
+	}// 'svg', 'bars', xAxis, 
 
 	function getXScale( maxWidth){
 		return  d3.scale.ordinal()
@@ -66,15 +68,21 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 		xAxis = d3.svg.axis()
 		.scale(xScale)
 		.orient("bottom");
-		selections['xAxis'] =selections['svg'].append("g").call(xAxis)
+		selections['xAxis'] =selections['svg'].append("g").remove()
 		.attr("transform","translate("+lMargin+","+tMargin+")"); 
 	}
 	this.createYAxis = function (lMargin, tMargin){
 		yAxis =  d3.svg.axis()
 		.scale(yScale)
 		.orient("right");
-		selections['yAxis'] = selections['svg'].append("g").call(yAxis)
+		selections['yAxis'] = selections['svg'].append("g").remove()
 		.attr("transform","translate("+lMargin+","+tMargin+")");
+	}
+	this.draw= function(){
+		document.body.appendChild(selections['svg'].node());
+		console.log("yAxis orientation is: "+ yAxis.orient());
+		document.querySelector('svg').appendChild(selections['xAxis'].call(xAxis).node());
+		document.querySelector('svg').appendChild(selections['yAxis'].call(yAxis).node());
 	}
 
 }
