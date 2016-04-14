@@ -36,11 +36,11 @@ barChart.js"></script>
 			{name:"F",freq: 6},
 			];
 			var chart = new BarChart(data, function key(d){return d.name;}, function(d){return d.freq;});
-			chart.createSvg(400, 200, 0, 0);
+			chart.createSvg(400, 200);
 			// chart.initScales();
-			chart.createBars("bar",20,20,20,20);
-			chart.createXAxis(20, 180);
-			chart.createYAxis(0,20);
+			chart.createBars("bar", 50, 5, 5,50);
+			chart.createXAxis(50,30);
+			chart.createYAxis();
 
 			chart.colorBarsRandom();
 			chart.getSelection('xAxis').attr("class", "axis");

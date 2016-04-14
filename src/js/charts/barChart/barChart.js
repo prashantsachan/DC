@@ -1,3 +1,9 @@
+//TODO: lean up the class by pulling methods out of it
+// svg translate transform doesn't work
+// auto compute size of text in axes
+// axes label
+//on hover behaviour
+
 var BarChart  = function(dataSet, keyGetter, valGetter){
 	var dataset = dataSet ; // elements of format: key:<name>, value:<val>
 	var keyGet = keyGetter ;
@@ -8,6 +14,10 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 	var xAxis;
 	var yAxis;
 	var selections = {};// 'svg', 'bars', 'xAxis', 'yAxis'
+	var margins = {}
+	//svg: left, top => relative to the document
+	//bars: right left, top, bottom => relative to svg
+	// axes: left, bottom => relative to svg's left bottom corner
 
 	this.getXScale = function(){return xScale;};
 	this.getYScale = function(){return yScale;};
@@ -17,19 +27,15 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 	this.getSelection = function (name){return selections[name]};
 
 	this.createSvg = function (width, height, xStart, yStart){
-		// var svg =  document.createElementNS(d3.ns.prefix.svg, 'svg');
-
-		// svg.setAttribute("width", width);
-		// svg.setAttribute("height", height);
-		// svg.setAttribute("transform","translate("+xStart+","+yStart+")");
-		// return svg;
 		selections['svg'] = d3.select("body").append("svg")
 			.remove()
 			.attr("width", width)
 			.attr("height", height)
-			.attr("transform", "translate("+xStart+","+yStart+")");
-		
-	}// 'svg', 'bars', xAxis, 
+		lMargin = (xStart)? xStart: 0;
+		tMargin = (yStart)? yStart: 0;
+		margins['svg'] = {'left': lMargin, 'top':tMargin};	
+		selections['svg'].attr("transform", "translate("+lMargin+","+tMargin+")");
+	} 
 
 	function getXScale( maxWidth){
 		return  d3.scale.ordinal()
@@ -43,9 +49,21 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 				.range([maxHeight,0]);
 	}
 	
-	this.createBars = function (barClass, lMargin, rMargin, tMargin,bMargin){
+	this.createBars = function (barClass, left,right,top,bottom){
+		
+		var lMargin = (left || 0) ;
+		var rMargin = (right || 0);
+		var tMargin = (top || 0);
+		var bMargin = (bottom || 0);
+		margins['bars'] = {
+			'left':lMargin,
+			'right':rMargin,
+			'top':tMargin,
+			'bottom':bMargin
+		}
 		var maxHeight = parseInt(selections['svg'].style("height").replace("px", "")) - tMargin -bMargin;
 		var maxWidth = parseInt(selections['svg'].style("width").replace("px", "")) - lMargin - rMargin;
+
 		xScale = getXScale(maxWidth);
 		yScale = getYScale(maxHeight);
 		selections['bars'] = selections['svg']
@@ -53,34 +71,53 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 				.data(dataset)
 				.enter().append("rect");
 		selections['bars']
-			.attr("x", function(d){return lMargin+ xScale(keyGet(d));})
-			.attr("y", function(d){return tMargin + yScale(valGet(d));})
+			.attr("x", function(d){return margins['svg']['left']+lMargin+ xScale(keyGet(d));})
+			.attr("y", function(d){return margins['svg']['top']+tMargin + yScale(valGet(d));})
 			.attr("width", xScale.rangeBand())
 			.attr("height", function(d){return maxHeight- yScale(valGet(d));});
-		// bars rects;
+		
 	}
 	this.colorBarsRandom = function(){
 		var color = d3.scale.category10()
 			.domain(dataset, function(d){return keyGet(d);});
 		selections['bars'].attr("fill",  function(d){return color(keyGet(d));});
 	}
-	this.createXAxis = function (lMargin, tMargin){
+	this.createXAxis = function (left, bottom){ // default: left= margins['bars']['left'], bottom
+		var svgHeight = parseInt(selections['svg'].style("height").replace("px", ""));
+		var lMargin = left ? left:margins['bars']['left'];
+		var bMargin = bottom? bottom: margins['bars']['bottom'];
+		margins['xAxis']={
+			'left': lMargin,
+			'bottom':bMargin
+		}
+
 		xAxis = d3.svg.axis()
 		.scale(xScale)
 		.orient("bottom");
+		
 		selections['xAxis'] =selections['svg'].append("g").remove()
-		.attr("transform","translate("+lMargin+","+tMargin+")"); 
+		.attr("transform","translate("+(margins['svg']['left']+lMargin)+","+
+			(margins['svg']['top']+svgHeight-bMargin)+")"); 
 	}
-	this.createYAxis = function (lMargin, tMargin){
+	this.createYAxis = function (left, bottom){
+		var lMargin = left ? left:margins['bars']['left'];
+		var bMargin = bottom? bottom: margins['bars']['bottom'];
+		var svgHeight = parseInt(selections['svg'].style("height").replace("px", ""));
+		margins['yAxis']={
+			'left': lMargin,
+			'bottom':bMargin
+		}
+
 		yAxis =  d3.svg.axis()
 		.scale(yScale)
-		.orient("right");
+		.orient("left");
+		
 		selections['yAxis'] = selections['svg'].append("g").remove()
-		.attr("transform","translate("+lMargin+","+tMargin+")");
+		.attr("transform","translate("+(margins['svg']['left']+lMargin)+","+
+			(margins['bars']['top']- (bMargin- margins['bars']['bottom']))+")");
 	}
 	this.draw= function(){
 		document.body.appendChild(selections['svg'].node());
-		console.log("yAxis orientation is: "+ yAxis.orient());
 		document.querySelector('svg').appendChild(selections['xAxis'].call(xAxis).node());
 		document.querySelector('svg').appendChild(selections['yAxis'].call(yAxis).node());
 	}
