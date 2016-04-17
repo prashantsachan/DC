@@ -1,5 +1,5 @@
 # BarChart
-
+An easy to use barchart library. Follows a quick guide to its usage and functionality offered. to try it, see [barChart Demo](../../../../../test/js/charts/barChart/barChartDemo.html)
 ## Usage
 ---------
 * __Include the Library file__ in your html document by 
@@ -32,16 +32,18 @@
 	chart.createSvg(<width>, <height>) 
 	```
 	everything related to the barChart will be drawn inside this svg
-* __Populate Bars__: create bars nside the svg created by one of the following methods: 
-	1. define the bounding area for bars inside SVG container by setting margins of all 4 sides
+* __Populate Bars__: create bars inside the svg created. it takes five parameters (in order): 
+	
 	```javascript
-	chart.createBars("bar", leftMargin, righMargin, topMargin,bottomMargin);
+	chart.createBars(spacing, leftMargin, righMargin, topMargin,bottomMargin);
 	```
-	2. set all margins to 0. (possibly) filling the whole area with bars
-	```javascript
-	chart.createBars("bar", leftMargin, righMargin, topMargin,bottomMargin);
-	```
-	"bar" in the both the methods is name of the CSS class to be applied to the bars. Supply some junk if you don't want to apply a class to bars
+	* spacing: fraction of bar width, that will be used as space between bars (range: 0.0-1.0, default =0.1)
+	* leftMargin: margin to be left from left wall of the container (range: 0-svgWidth, default =0)
+	* rightMargin: right Margin to be left from right wall of container ( range: 0-svgWidth, default=0)
+	* topMargin: margin to be left from top wall of the container (range: 0-svgHeight, default =0)
+	* bottomMargin: right Margin to be bottom from righ wall of container ( range: 0-svgHeight, default=0)
+
+	
 * __Create Axes__ [optional]: to use this, leave some margin while creating bars i.e. use method 1 to create bars.
 	* Default location: 
 		```javascript
@@ -55,7 +57,12 @@
 		chart.createYAxis(lMargin, bMargin);
 		```
 		creates the axes at specific margins. Mind you that these margins are measured from bottom left corner of the surround svg </br>
-And... its there.
+* __Draw it__ :
+	Add it to the body of the document by calling 
+	```javascript
+	chart.draw();
+	```
+	And... its there.
 
 ## Customizations
 ----------------

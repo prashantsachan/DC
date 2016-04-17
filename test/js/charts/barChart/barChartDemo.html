@@ -4,16 +4,15 @@
 		<meta charset="UTF-8">
 	</head> 
 	<body>
-		<p> look for d3.min.js in source </p>
 		<style>
 		.bar{
 			/*fill: steelblue;*/
 			stroke:black;
-			stroke-width:5;
+			stroke-width:2;
 			opacity:1.0		}
 		.axis path,
 		.axis line {
-		    fill: none;
+			    fill: none;
 		    stroke: black;
 		    shape-rendering: crispEdges;
 			}
@@ -27,6 +26,7 @@
 		<script type="text/javascript" src="../../../../src/js/charts/barChart/
 barChart.js"></script>
 		<script type="text/javascript">
+			//the data
 			var data= [
 			{name:"A",freq: 17},
 			{name:"B",freq: 7},
@@ -34,21 +34,65 @@ barChart.js"></script>
 			{name:"D",freq: 10},
 			{name:"E",freq: 20},
 			{name:"F",freq: 6},
+			{name: "G", freq: 50}
 			];
-			var chart = new BarChart(data, function key(d){return d.name;}, function(d){return d.freq;});
-			chart.createSvg(400, 200);
-			// chart.initScales();
-			chart.createBars("bar", 50, 5, 5,50);
-			chart.createXAxis(50,30);
-			chart.createYAxis();
+			function drawChart(){
+				d3.selectAll('svg').remove();
+				var svgWidth = parseInt(document.getElementById("svgwidth").value);
+				var svgHeight = parseInt(document.getElementById("svgheight").value);
+				// alert("svg width: "+svgWidth+", height: "+svgHeight);
+				var chart = new BarChart(data, function key(d){return d.name;}, function(d){return d.freq;});
+				chart.createSvg(svgWidth, svgHeight);
+				var barSpacing = parseFloat(document.getElementById("barspacing").value);
+				var barLeft = parseInt(document.getElementById("barleftmargin").value);
+				var barRight = parseInt(document.getElementById("barrightmargin").value);
+				var barTop = parseInt(document.getElementById("bartopmargin").value);
+				var barBottom = parseInt(document.getElementById("barbottommargin").value);
+				chart.createBars(barSpacing, barLeft, barRight, barTop, barBottom);
+				var xleft = parseInt(document.getElementById("xaxisleftmargin").value);
+				var xbottom = parseInt(document.getElementById("xaxisbottommargin").value);
+				chart.createXAxis(xleft, xbottom);
 
-			chart.colorBarsRandom();
-			chart.getSelection('xAxis').attr("class", "axis");
-			chart.getSelection('yAxis').attr("class", "axis");
-			// to change axes orientation,
-			// chart.getYAxis().orient("left");
-			chart.draw();
+				var yleft = parseInt(document.getElementById("yaxisleftmargin").value);
+				var ybottom = parseInt(document.getElementById("yaxisbottommargin").value);
+				chart.createYAxis(yleft, ybottom);
+				chart.colorBarsRandom();
+				chart.getSelection('xAxis').attr("class", "axis");
+				chart.getSelection('yAxis').attr("class", "axis");
+				chart.draw();
+			}
 
 		</script>
+		<div style="float:left;">
+			<h4>create svg container of  </h4>
+			width: <input type="text" id="svgwidth" maxlength=5 size=5 min=100 max = 1024, value=400><br>
+  			height: <input type="text" id="svgheight" maxlength=5 size=5 min=50 max = 768, value=200><br>
+  		</div>
+  		<!-- <div style="clear:both;">&nbsp;</div> -->
+  		<div style="float:left;">
+  		 	<h4>create bars with following margin (relative to container boundaries)</h4>
+  		 	spacing: <input type="text" id="barspacing" maxlength=5 size=5 min=0 max = 1, value=0.1><br>
+			left: <input type="text" id="barleftmargin" maxlength=5 size=5 min=0 max = 1024, value=50><br>
+  			right: <input type="text" id="barrightmargin" maxlength=5 size=5 min=0 max = 768, value=5><br>
+  			top: <input type="text" id="bartopmargin" maxlength=5 min=0 size=5 max = 1024, value=5><br>
+  			bottom: <input type="text" id="barbottommargin" maxlength=5 size=5 min=0 max = 768, value=50><br>
+  		</div>
+  		<!-- <div style="clear:both;">&nbsp;</div> -->
+  		<div style="float:left;">
+  			<h4> create xAxis with these margins (relative to bottom-left corner of container)</h4>
+			left: <input type="text" id="xaxisleftmargin" maxlength=5 size=5 min=0 max = 1024 ><br>
+  			right: <input type="text" id="xaxisbottommargin" maxlength=5 size=5 min=0 max = 768><br>
+  		</div>
+  		<!-- <div style="clear:both;">&nbsp;</div> -->
+  		<div style="float:left;">
+  			<h4> create yAxis with these margins (relative to bottom-left corner of container)</h4>
+			left: <input type="text" id="yaxisleftmargin" maxlength=5 size=5 min=0 max = 1024><br>
+  			right: <input type="text" id="yaxisbottommargin" maxlength=5 size=5 min=0 max = 768><br>
+  		</div>
+  		<div style="clear:both;">&nbsp;</div>
+  		<div style="float:left;">
+  			<input type="submit" name="draw" value="draw it !" font-weight=700 onclick="drawChart();"><br>
+  		</div>
+  	</br>
 	</body>
 </html>

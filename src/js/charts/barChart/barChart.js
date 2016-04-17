@@ -37,10 +37,10 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 		selections['svg'].attr("transform", "translate("+lMargin+","+tMargin+")");
 	} 
 
-	function getXScale( maxWidth){
+	function getXScale( spacingFraction, maxWidth){
 		return  d3.scale.ordinal()
 				.domain(dataset.map(keyGet))
-				.rangeRoundBands([0,maxWidth], 0.1);
+				.rangeRoundBands([0,maxWidth], spacingFraction);
 	}
 	function getYScale( maxHeight){
 		var maxY = d3.max(dataset, function(d){return valGet(d);});
@@ -49,12 +49,13 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 				.range([maxHeight,0]);
 	}
 	
-	this.createBars = function (barClass, left,right,top,bottom){
+	this.createBars = function (barSpacing, left,right,top,bottom){
 		
 		var lMargin = (left || 0) ;
 		var rMargin = (right || 0);
 		var tMargin = (top || 0);
 		var bMargin = (bottom || 0);
+		var spacing = (barSpacing || 0.1);
 		margins['bars'] = {
 			'left':lMargin,
 			'right':rMargin,
@@ -64,10 +65,12 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 		var maxHeight = parseInt(selections['svg'].style("height").replace("px", "")) - tMargin -bMargin;
 		var maxWidth = parseInt(selections['svg'].style("width").replace("px", "")) - lMargin - rMargin;
 
-		xScale = getXScale(maxWidth);
+		xScale = getXScale(spacing, maxWidth);
 		yScale = getYScale(maxHeight);
+
+		
 		selections['bars'] = selections['svg']
-				.selectAll(barClass)
+				.selectAll("rect")
 				.data(dataset)
 				.enter().append("rect");
 		selections['bars']
@@ -75,7 +78,6 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 			.attr("y", function(d){return margins['svg']['top']+tMargin + yScale(valGet(d));})
 			.attr("width", xScale.rangeBand())
 			.attr("height", function(d){return maxHeight- yScale(valGet(d));});
-		
 	}
 	this.colorBarsRandom = function(){
 		var color = d3.scale.category10()
