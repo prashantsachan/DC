@@ -117,9 +117,15 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 		selections['yAxis'] = selections['svg'].append("g").remove()
 		.attr("transform","translate("+(margins['svg']['left']+lMargin)+","+
 			(margins['bars']['top']- (bMargin- margins['bars']['bottom']))+")");
-	}
-	this.draw= function(){
-		document.body.appendChild(selections['svg'].node());
+	
+	}	
+	this.draw= function(elementId){
+		var root ;
+		if(elementId)
+			root = document.getElementById(elementId);
+		else
+			root = document.body;
+		root.appendChild(selections['svg'].node());
 		document.querySelector('svg').appendChild(selections['xAxis'].call(xAxis).node());
 		document.querySelector('svg').appendChild(selections['yAxis'].call(yAxis).node());
 	}

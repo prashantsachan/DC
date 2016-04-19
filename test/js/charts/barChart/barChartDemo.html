@@ -59,7 +59,7 @@ barChart.js"></script>
 				chart.colorBarsRandom();
 				chart.getSelection('xAxis').attr("class", "axis");
 				chart.getSelection('yAxis').attr("class", "axis");
-				chart.draw();
+				chart.draw("barChartDiv");
 			}
 
 		</script>
@@ -92,6 +92,9 @@ barChart.js"></script>
   		<div style="clear:both;">&nbsp;</div>
   		<div style="float:left;">
   			<input type="submit" name="draw" value="draw it !" font-weight=700 onclick="drawChart();"><br>
+  		</div>
+  		<div id="barChartDiv" >
+  			<p> bar chart will be drawn here</p>
   		</div>
   	</br>
 	</body>
