@@ -36,12 +36,13 @@ barChart.js"></script>
 			{name:"F",freq: 6},
 			{name: "G", freq: 50}
 			];
+			var chart;
 			function drawChart(){
 				d3.selectAll('svg').remove();
 				var svgWidth = parseInt(document.getElementById("svgwidth").value);
 				var svgHeight = parseInt(document.getElementById("svgheight").value);
 				// alert("svg width: "+svgWidth+", height: "+svgHeight);
-				var chart = new BarChart(data, function key(d){return d.name;}, function(d){return d.freq;});
+				chart = new BarChart(data, function key(d){return d.name;}, function(d){return d.freq;});
 				chart.createSvg(svgWidth, svgHeight);
 				var barSpacing = parseFloat(document.getElementById("barspacing").value);
 				var barLeft = parseInt(document.getElementById("barleftmargin").value);
@@ -59,6 +60,9 @@ barChart.js"></script>
 				chart.colorBarsRandom();
 				chart.getSelection('xAxis').attr("class", "axis");
 				chart.getSelection('yAxis').attr("class", "axis");
+				chart.createLine(0.5,true);
+				chart.getSelection('area').attr("fill","blue");
+				chart.createBarTips(0.2,0.5);
 				chart.draw("barChartDiv");
 			}
 

@@ -8,8 +8,11 @@ An easy to use barchart library. Follows a quick guide to its usage and function
 	```
 	var chart = new BarChart(dataset, xGet, yGet)
 	```
-	where dataset is collection of objects. xGet is a function which when called on each element of dataset, returns the value on x-Axis. yGet is a function which when called on each element of dataset, returns the value on y Axis
-	+ **e.g.** 
+	* _dataset_: Collection of objects. 
+	* _xGet_: A function which when called on each element of dataset, returns a value on x-Axis. 
+	* _yGet_: A function which when called on each element of dataset, returns the value on y-Axis.
+	
+	__e.g.__ 
 	if your data is declared like this
 	```javascript
 	var dataset = [
@@ -29,34 +32,52 @@ An easy to use barchart library. Follows a quick guide to its usage and function
 	```
 * __Create the svg element__ by 
 	```javascript
-	chart.createSvg(<width>, <height>) 
+	chart.createSvg(width, height);
 	```
-	everything related to the barChart will be drawn inside this svg
+	* _width_: width of the svg container
+	* _height_: height of the svg container
+
+	everything related to the barChart will be drawn inside this container. In a sense, it is our playground.
 * __Populate Bars__: create bars inside the svg created. it takes five parameters (in order): 
 	
 	```javascript
 	chart.createBars(spacing, leftMargin, righMargin, topMargin,bottomMargin);
 	```
-	* spacing: fraction of bar width, that will be used as space between bars (range: 0.0-1.0, default =0.1)
-	* leftMargin: margin to be left from left wall of the container (range: 0-svgWidth, default =0)
-	* rightMargin: right Margin to be left from right wall of container ( range: 0-svgWidth, default=0)
-	* topMargin: margin to be left from top wall of the container (range: 0-svgHeight, default =0)
-	* bottomMargin: right Margin to be bottom from righ wall of container ( range: 0-svgHeight, default=0)
+	* _spacing_: fraction of bar width, that will be used as space between bars (range: 0.0-1.0, default =0.1)
+	* _leftMargin_: margin from left wall of the container (range: 0-svgWidth, default =0)
+	* _rightMargin_: right Margin from right wall of container ( range: 0-svgWidth, default=0)
+	* _topMargin_: margin from top wall of the container (range: 0-svgHeight, default =0)
+	* _bottomMargin_: right Margin from bottom wall of container ( range: 0-svgHeight, default=0)
 
 	
 * __Create Axes__ [optional]: to use this, leave some margin while creating bars i.e. use method 1 to create bars.
-	* Default location: 
-		```javascript
-		chart.createXAxis();
-		chart.createXAxis();
-		```
-		 this creates the axes starting from the bottom left corner of the first bar
-	* Custom Location: 
-		```javascript 
-		chart.createXAxis(lMargin, bMargin);
-		chart.createYAxis(lMargin, bMargin);
-		```
-		creates the axes at specific margins. Mind you that these margins are measured from bottom left corner of the surround svg </br>
+	```javascript 
+	chart.createXAxis(lMargin, bMargin);
+	chart.createYAxis(lMargin, bMargin);
+	```
+	* _lMargin_: margin measured from left wall of the svg container (range: 0-svgWidth, default =left margin for bars)
+	* _bMargin_: argin measured from bottom wall of the svg container (range: 0-svgHeight, default= bottom margin for bars)
+
+	Thus calling 
+	```javascript
+	chart.createXAxis();
+	chart.createYAxis();
+	```
+	will create the axes starting from the bottom left corner of the first bar
+* __Create barTips__ [optional]: you can add a circle at the top edge of each bar by calling 
+	```javascript
+	chart.createBarTips(diameterFraction, positionFraction);
+	```
+	* _diameterFraction_: diameter of the circle in a fraction of BarWidth (range: 0.0-1.0, default: 0.2)
+	* _positionFraction_: position of circle's center from left edge of Bar, in fraction of barWidth (range: 0.0-1.0, default: 0.2)
+	
+	Thus calling
+	```javascript
+	chart.createBarTips();
+	```
+	will create barTips of diameter= 20% of bar width, at the vertical middle line of the bar.
+* __Create Line__ [optional]: you can add a line chart connecting the top edges of the bars. Optionally, shading the area below it.
+	* 
 * __Draw it__ :
 	Add it to the body of the document by calling 
 	```javascript
@@ -93,12 +114,18 @@ Each BarChart has 4 components (each of which is a d3.js selection):
   * _bars_: collections of bars (svg rectangles)
   * _xAxis_: group of axis line, tickMarks, tick labels(text) and axis labels (text)
   * _yAxis_: 
-these can be retrieved by 
+  * _barTips_: points (svg circle) drawn on the top edge of each bar
+  * _line_: line (svg path) connecting top edge of each bar
+  * _area_: (svg path) connecting top edge of each bar
+If you have created a component using _create..._ command, it can be retrieved by 
 ```
 chart.getSelection('svg');
 chart.getSelection('bars');
 chart.getSelection('xAxis');
 chart.getSelection('yAxis');
+chart.getSelection('barTips');
+chart.getSelection('line');
+chart.getSelection('area');
 ```
 you can apply any SVG attribute to these selections the d3 way</br>
 e.g. 

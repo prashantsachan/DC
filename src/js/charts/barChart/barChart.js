@@ -119,6 +119,45 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 			(margins['bars']['top']- (bMargin- margins['bars']['bottom']))+")");
 	
 	}	
+	this.createLine = function(posFraction, withArea){
+		var wFrac = (posFraction || 0.5);
+		// var svgHeight = parseInt(selections['svg'].style("height").replace("px", ""));
+		var maxBarHeight = yScale.range()[0];
+		function lineX(d){return (xScale.rangeBand()*wFrac)+ margins['svg']['left']+ margins['bars']['left']+ xScale(keyGet(d));}
+		function lineY(d){return margins['svg']['top']+ margins['bars']['top'] + yScale(valGet(d));}
+		var line = d3.svg.line()
+			.x(lineX)
+			.y(lineY)
+			.interpolate("linear");
+		selections['line'] = selections['svg'].append("path")
+						.remove()
+						.attr("d", line(dataset))
+						.attr("stroke", "black")
+						.attr("fill", "none");
+		if(withArea){
+			var shade = d3.svg.area()
+						.x(lineX)
+						.y1(lineY)
+						.y0(margins['svg']['top']+ margins['bars']['top']+maxBarHeight);
+			selections['area'] = selections['svg'].append('path')
+								.remove()
+								.attr('d', shade(dataset))
+								.attr("stroke", "none");
+		}
+	}
+	this.createBarTips = function(diaFraction, posFraction){
+		var wFrac = (posFraction || 0.5);
+		var rFrac = (diaFraction|| 0.2) /2;
+		var rad = rFrac* xScale.rangeBand();
+		selections['barTips'] = selections['svg'].selectAll('circle')
+								.data(dataset)
+								.enter()
+								.append('circle');
+		selections['barTips']
+							.attr('cx', function(d){return (xScale.rangeBand() * wFrac)+ margins['svg']['left']+ margins['bars']['left']+ xScale(keyGet(d));})
+							.attr('cy',function(d){return margins['svg']['top']+ margins['bars']['top'] + yScale(valGet(d));})
+							.attr('r', rad);
+	}
 	this.draw= function(elementId){
 		var root ;
 		if(elementId)
@@ -126,8 +165,18 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 		else
 			root = document.body;
 		root.appendChild(selections['svg'].node());
-		document.querySelector('svg').appendChild(selections['xAxis'].call(xAxis).node());
-		document.querySelector('svg').appendChild(selections['yAxis'].call(yAxis).node());
+		var svgElem = document.querySelector('svg');
+		if(selections['xAxis'])
+			svgElem.appendChild(selections['xAxis'].call(xAxis).node());
+		if(selections['yAxis'])
+			svgElem.appendChild(selections['yAxis'].call(yAxis).node());
+		if(selections['area'])
+			svgElem.appendChild(selections['area'].node());
+		if (selections['line'])
+			svgElem.appendChild(selections['line'].node());	
+		if(selections['bartips'])
+			svgElem.appendChild(selections['barTips'].node());
+
 	}
 
 }
