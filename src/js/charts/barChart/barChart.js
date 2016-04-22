@@ -9,8 +9,8 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 	var keyGet = keyGetter ;
 	var valGet = valGetter;
 	// exposed elements
-	var xScale ;//= getXScale(width);
-	var yScale ;//= getYScale(height);
+	var xScale ;
+	var yScale ;
 	var xAxis;
 	var yAxis;
 	var selections = {};// 'svg', 'bars', 'xAxis', 'yAxis'
@@ -18,7 +18,9 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 	//svg: left, top => relative to the document
 	//bars: right left, top, bottom => relative to svg
 	// axes: left, bottom => relative to svg's left bottom corner
-
+	var drawables = ['bars','area','line','barTips','xAxis','yAxis'];
+	this.getDrawables = function(){return drawables;};
+	this.setDrawables = function(newSeq){ drawables=newSeq;};
 	this.getXScale = function(){return xScale;};
 	this.getYScale = function(){return yScale;};
 	this.getXAxis = function(){return xAxis;};
@@ -71,7 +73,7 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 		selections['bars'] = selections['svg']
 				.selectAll("rect")
 				.data(dataset)
-				.enter().append("rect");
+				.enter().append("rect").remove();
 		selections['bars']
 			.attr("x", function(d){return margins['svg']['left']+lMargin+ xScale(keyGet(d));})
 			.attr("y", function(d){return margins['svg']['top']+tMargin + yScale(valGet(d));})
@@ -150,11 +152,14 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 		selections['barTips'] = selections['svg'].selectAll('circle')
 								.data(dataset)
 								.enter()
-								.append('circle');
+								.append('circle')
+								.remove();
+								
 		selections['barTips']
 							.attr('cx', function(d){return (xScale.rangeBand() * wFrac)+ margins['svg']['left']+ margins['bars']['left']+ xScale(keyGet(d));})
 							.attr('cy',function(d){return margins['svg']['top']+ margins['bars']['top'] + yScale(valGet(d));})
 							.attr('r', rad);
+							// .remove();
 	}
 	this.draw= function(elementId){
 		var root ;
@@ -164,17 +169,23 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 			root = document.body;
 		root.appendChild(selections['svg'].node());
 		var svgElem = document.querySelector('svg');
-		if(selections['xAxis'])
-			svgElem.appendChild(selections['xAxis'].call(xAxis).node());
-		if(selections['yAxis'])
-			svgElem.appendChild(selections['yAxis'].call(yAxis).node());
-		if(selections['area'])
-			svgElem.appendChild(selections['area'].node());
-		if (selections['line'])
-			svgElem.appendChild(selections['line'].node());	
-		if(selections['bartips'])
-			svgElem.appendChild(selections['barTips'].node());
+		for(var i=0;i<drawables.length;i++){
+			drawComponent(svgElem, drawables[i]);	
+		}
+	}
+	function drawComponent(svgElem, componentId){
+		if(selections[componentId]){
+			if(componentId=== 'xAxis')
+				svgElem.appendChild(selections['xAxis'].call(xAxis).node());
+			else if( componentId=== 'yAxis')
+				svgElem.appendChild(selections['yAxis'].call(yAxis).node());
+			else
+				for(var i=0;i<selections[componentId].length;i++)
+					for(var j=0;j<selections[componentId][i].length;j++)
+						selections['svg'].append(function(){return selections[componentId][i][j];});
 
+			//svgElem.appendChild(selections[componentId].node());
+		}
 	}
 
 }

@@ -63,6 +63,8 @@ barChart.js"></script>
 				chart.createLine(0.5,true);
 				chart.getSelection('area').attr("fill","blue");
 				chart.createBarTips(0.2,0.5);
+				console.log("default order is: "+ chart.getDrawables());
+				chart.setDrawables(['area','bars','line','barTips','xAxis','yAxis'])
 				chart.draw("barChartDiv");
 			}
 

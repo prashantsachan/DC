@@ -2,8 +2,11 @@
 An easy to use barchart library. Follows a quick guide to its usage and functionality offered. to try it, see [barChart Demo](../../../../../test/js/charts/barChart/barChartDemo.html)
 ## Usage
 ---------
-* __Include the Library file__ in your html document by 
-`<script type="text/javascript" src="path-to-barChart/barChart.js"></script>`
+* __Include the Library files__ in your html document by 
+```
+<script type="text/javascript" src="path-to-barChart/barChart.js"></script>
+<script type="text/javascript" src="path-to-d3.js"></script>
+```
 * __Instantiate the barChart__ by 
 	```
 	var chart = new BarChart(dataset, xGet, yGet)
@@ -69,15 +72,31 @@ An easy to use barchart library. Follows a quick guide to its usage and function
 	chart.createBarTips(diameterFraction, positionFraction);
 	```
 	* _diameterFraction_: diameter of the circle in a fraction of BarWidth (range: 0.0-1.0, default: 0.2)
-	* _positionFraction_: position of circle's center from left edge of Bar, in fraction of barWidth (range: 0.0-1.0, default: 0.2)
+	* _positionFraction_: position of circle's center from left edge of Bar, in fraction of barWidth (range: 0.0-1.0, default: 0.5)
 	
 	Thus calling
 	```javascript
 	chart.createBarTips();
 	```
 	will create barTips of diameter= 20% of bar width, at the vertical middle line of the bar.
-* __Create Line__ [optional]: you can add a line chart connecting the top edges of the bars. Optionally, shading the area below it.
-	* 
+* __Create Line__ [optional]: you can add a line chart connecting the top edges of the bars (_line_ component is created). Optionally, shading the area below it by calling: 
+	``` javascript
+	chart.createLine(positionFraction, whetherToShadeArea)
+	```
+	* _positionFraction_: position of the point on each bar, in fraction of barWidth(range: 0.0-1.0, default:0.5)
+	* _whetherToShadeArea_: whether to shade the area below line. if set to _true_, the 'area' component of BarChart is created. (true/ false)
+	Thus calling 
+	```javascript
+	chart.createLine()
+	```
+	will create a line connecting the middle top point of each bar. And calling
+	```javascript
+	chart.createLine(0.5,true)
+	```
+	will create the same line along with shading the area below it. Normally you should assign this area some nice svg attribute by calling 
+	```javascript
+	chart.getSelection('area').attr('class','areaClass');
+	```
 * __Draw it__ :
 	Add it to the body of the document by calling 
 	```javascript
@@ -88,6 +107,20 @@ An easy to use barchart library. Follows a quick guide to its usage and function
 ## Customizations
 ----------------
 components of a BarChart can be modified in several ways. Though they need to be first created and then customized.
+### Order of rendering chart components
+Barchart components are nothing but group of svg elements and they are drawn one after another. If two components overlap, earlier drawn component is covered. Currently the components of barChart are drawn in the following order
+```
+'bars','area','line','barTips','xAxis','yAxis'
+```
+This means _area_(if drawn) will cover a part of _bars_. However you should not rely on the above mentioned sequence (array of String), rather, you should retrieve it by calling
+```javascript
+chart.getDrawables()
+```
+If you wish to modify this order, call
+```javascript
+chart.setDrawables(componentsArray);
+```
+* _componentsArray_: array of String. List of array components to be drawn, in Order.
 #### Color Bars Randomly
 you can colour the bars randomly (10 prefdefined colors) by calling: 
 ```javascript
