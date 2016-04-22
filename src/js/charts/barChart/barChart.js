@@ -62,9 +62,8 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 			'top':tMargin,
 			'bottom':bMargin
 		}
-		var maxHeight = parseInt(selections['svg'].style("height").replace("px", "")) - tMargin -bMargin;
-		var maxWidth = parseInt(selections['svg'].style("width").replace("px", "")) - lMargin - rMargin;
-
+		var maxHeight = parseInt(selections['svg'].attr('height'))- tMargin -bMargin;
+		var maxWidth = parseInt(selections['svg'].attr('width'))- lMargin - rMargin;
 		xScale = getXScale(spacing, maxWidth);
 		yScale = getYScale(maxHeight);
 
@@ -84,8 +83,8 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 			.domain(dataset, function(d){return keyGet(d);});
 		selections['bars'].attr("fill",  function(d){return color(keyGet(d));});
 	}
-	this.createXAxis = function (left, bottom){ // default: left= margins['bars']['left'], bottom
-		var svgHeight = parseInt(selections['svg'].style("height").replace("px", ""));
+	this.createXAxis = function (left, bottom){
+		var svgHeight = parseInt(selections['svg'].attr("height"));
 		var lMargin = left ? left:margins['bars']['left'];
 		var bMargin = bottom? bottom: margins['bars']['bottom'];
 		margins['xAxis']={
@@ -104,7 +103,7 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 	this.createYAxis = function (left, bottom){
 		var lMargin = left ? left:margins['bars']['left'];
 		var bMargin = bottom? bottom: margins['bars']['bottom'];
-		var svgHeight = parseInt(selections['svg'].style("height").replace("px", ""));
+		var svgHeight = parseInt(selections['svg'].attr('height'));
 		margins['yAxis']={
 			'left': lMargin,
 			'bottom':bMargin
@@ -121,7 +120,6 @@ var BarChart  = function(dataSet, keyGetter, valGetter){
 	}	
 	this.createLine = function(posFraction, withArea){
 		var wFrac = (posFraction || 0.5);
-		// var svgHeight = parseInt(selections['svg'].style("height").replace("px", ""));
 		var maxBarHeight = yScale.range()[0];
 		function lineX(d){return (xScale.rangeBand()*wFrac)+ margins['svg']['left']+ margins['bars']['left']+ xScale(keyGet(d));}
 		function lineY(d){return margins['svg']['top']+ margins['bars']['top'] + yScale(valGet(d));}
