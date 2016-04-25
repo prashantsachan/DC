@@ -1,5 +1,5 @@
 # BarChart
-An easy to use barchart library. Follows a quick guide to its usage and functionality offered. to try it, see [barChart Demo](../../../../../test/js/charts/barChart/barChartDemo.html)
+An easy to use barchart library. Follows a quick guide to its usage and functionality offered. to try it, see [barChart Demo](../../../../test/js/charts/barChart/barChartDemo.html)
 ## Usage
 ---------
 * __Include the Library files__ in your html document by 
