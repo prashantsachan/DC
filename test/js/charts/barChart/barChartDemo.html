@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+	 <head>
+		<meta charset="UTF-8">
+	</head> 
+	<body>
+		<style>
+		.bar{
+			/*fill: steelblue;*/
+			stroke:black;
+			stroke-width:2;
+			opacity:1.0		}
+		.axis path,
+		.axis line {
+			    fill: none;
+		    stroke: black;
+		    shape-rendering: crispEdges;
+			}
+
+		.axis text {
+		    font-family: sans-serif;
+		    font-size: 11px;
+			}
+		</style>
+		<script type="text/javascript" src="../../../../lib/js/d3.js"></script>
+		<script type="text/javascript" src="../../../../src/js/charts/barChart/
+barChart.js"></script>
+		<script type="text/javascript">
+			//the data
+			var data= [
+			{name:"A",freq: 17},
+			{name:"B",freq: 7},
+			{name:"C",freq: 3},
+			{name:"D",freq: 10},
+			{name:"E",freq: 20},
+			{name:"F",freq: 6},
+			{name: "G", freq: 50}
+			];
+			var chart = new BarChart(data, function key(d){return d.name;}, function(d){return d.freq;});
+			function drawChart(){
+				d3.selectAll('svg').remove();
+				var svgWidth = parseInt(document.getElementById("svgwidth").value);
+				var svgHeight = parseInt(document.getElementById("svgheight").value);
+				// alert("svg width: "+svgWidth+", height: "+svgHeight);
+				chart.createSvg(svgWidth, svgHeight);
+				var barSpacing = parseFloat(document.getElementById("barspacing").value);
+				var barLeft = parseInt(document.getElementById("barleftmargin").value);
+				var barRight = parseInt(document.getElementById("barrightmargin").value);
+				var barTop = parseInt(document.getElementById("bartopmargin").value);
+				var barBottom = parseInt(document.getElementById("barbottommargin").value);
+
+				chart.createBars(barSpacing, barLeft, barRight, barTop, barBottom);
+				if(document.querySelector('input[name = "xAxisType"]:checked').value!= 'none'){
+					var xleft = parseInt(document.getElementById("xaxisleftmargin").value);
+					var xbottom = parseInt(document.getElementById("xaxisbottommargin").value);
+					chart.createXAxis(xleft, xbottom);
+					chart.getSelection('xAxis').attr("class", "axis");
+				}
+				if(document.querySelector('input[name = "yAxisType"]:checked').value!='none'){
+					var yleft = parseInt(document.getElementById("yaxisleftmargin").value);
+					var ybottom = parseInt(document.getElementById("yaxisbottommargin").value);
+					chart.createYAxis(yleft, ybottom);
+					chart.getSelection('yAxis').attr("class", "axis");
+				}
+				if(document.querySelector('input[name = "barTipsType"]:checked').value!='none'){	
+					var rad = parseFloat(document.getElementById("barTipsRad").value);
+					var pos = parseFloat(document.getElementById("barTipsPos").value);
+					chart.createBarTips(rad,pos);
+				}
+				if(document.querySelector('input[name = "lineType"]:checked').value!='none'){
+					var pos = parseFloat(document.getElementById("linePos").value);
+					var createArea = document.getElementById("lineArea").checked;
+					chart.createLine(pos,createArea);
+					if(createArea)
+						chart.getSelection('area').attr("fill","blue");
+				}
+				if(document.getElementById("multiColorType").checked)
+					chart.colorBarsRandom();
+				var order = document.getElementById("drawables").value.split(",").map(function(e){return e.trim();});
+				chart.setDrawables(order);
+				chart.draw("barChartDiv");
+			}
+			function hideElem(elemId){
+				document.getElementById(elemId).style.display='none';
+				var labels = document.getElementsByTagName('label');
+				for(var i = 0; i < labels.length; i ++) {
+		            if(labels[i].getAttribute('for') === elemId) {
+			            labels[i].style.display = 'none';
+			        }
+			    }
+			}
+			function unhideElem(elemId){
+				document.getElementById(elemId).style.display='block';
+				var labels = document.getElementsByTagName('label');
+				for(var i = 0; i < labels.length; i ++) {
+		        // var attr = ; //or labels[i].htmlFor
+			        if(labels[i].getAttribute('for') === elemId) {
+			            labels[i].style.display = 'block';
+			            //or labels[i].style.display = 'none';
+			        }
+			    }
+			}
+			function setTextInp(id, value){
+				document.getElementById(id).value=value;
+			}
+			function resetBarMargins(){
+				setTextInp('barleftmargin',0);
+				setTextInp('barrightmargin',0);
+				setTextInp('bartopmargin',0);
+				setTextInp('barbottommargin',0);
+			}
+			function deselectCheckbox(id){
+				document.getElementById(id).checked = false;
+			}
+
+		</script>
+
+		<div >
+			<h4>create svg container of  </h4>
+			<table >
+			  	<tr>
+			    	<td>
+			    		<label for="svgwidth">width:</label>
+						<input type="text" name="svgwidth" id="svgwidth" maxlength=5 size=5 min=100 max = 1024, value=400>
+			    	</td>
+			    	<td>
+			    		<label for="svgwidth">height:</label>
+  						<input type="text" name=="svgheight" id="svgheight" maxlength=5 size=5 min=50 max = 768, value=200>
+			    	</td>
+			  	</tr>
+			</table> 
+  		</div> 
+  		<!-- <div style="clear:both;">&nbsp;</div> -->
+  		<div >
+  			<h4>create bars with (relative to container boundaries)</h4>
+  			<form action="">
+			  <input type="radio" id="radioBarDefault" name="radioBarDefault" value="default" onclick="hideElem('barspacing');hideElem('barmargins'); setTextInp('barspacing',0);resetBarMargins();" > default options(spacing=10%, no margin)<br>
+			  <input type="radio" id="radioBarCustomSpacing" name="radioBarCustomSpacing" value="customSpacing" onclick="unhideElem('barspacing');hideElem('barmargins');resetBarMargins();" > custom spacing, default margins<br>
+			  <input type="radio" id="radioBarCustom" name="radioBarCustom" value="custom" onclick="unhideElem('barspacing');unhideElem('barmargins');"> custom spacing, margins<br>
+			</form>
+  		 	<label for="barspacing"> bar Spacing:</label>
+  		 	<input type="text" name="barspacing" id="barspacing" maxlength=5 size=5 min=0 max = 1, value=0.1><br>
+			<table id='barmargins' name='barmargins'>
+			  	<tr>
+			    	<td>
+			    		<label for="barleftmargin">left:</label>
+						<input type="text" name="barleftmargin" id="barleftmargin" maxlength=5 size=5 min=0 max = 1024, value=50>
+			    	</td>
+			    	<td>
+			    		<label for="barrightmargin">right:</label>
+  						<input type="text" name="barrightmargin" id="barrightmargin" maxlength=5 size=5 min=0 max = 768, value=5>
+			    	</td>
+			    	<td>
+			    		<label for="bartopmargin">top:</label>
+  						<input type="text" name="bartopmargin" id="bartopmargin" maxlength=5 min=0 size=5 max = 1024, value=5>
+			    	</td>
+			    	<td>
+			    		<label for="barbottommargin">bottom:</label>
+  						<input type="text" name="barbottommargin" id="barbottommargin" maxlength=5 size=5 min=0 max = 768, value=50>	
+			    	</td>
+			  	</tr>
+			</table>
+  		</div>
+  		<!-- <div style="clear:both;">&nbsp;</div> -->
+  		<div >
+  			<h4> create xAxis ?</h4>
+  			<form action="">
+  				<input type="radio" name="xAxisType" value="none" onclick="hideElem('xaxismargins');"> NO<br>
+		  		<input type="radio" name="xAxisType" value="default" onclick="hideElem('xaxismargins');setTextInp('xaxisleftmargin',0);setTextInp('xaxisbottommargin',0);"> yes, with default margins (axis starts from bottom left corner of first bar)<br>
+		  		<input type="radio" name="xAxisType" value="custom" onclick="unhideElem('xaxismargins');" > yes, with custom margins (relative to bottom left of container, 0 means default)<br>
+			</form>
+  			<table id='xaxismargins' name='xaxismargins'>
+			  	<tr>
+			    	<td>
+			    		<label for="xaxisleftmargin">left:</label>
+						<input type="text" name="xaxisleftmargin" id="xaxisleftmargin" maxlength=5 size=5 min=0 max = 1024 value=0>
+			    	</td>
+			    	<td>
+			    		<label for="xaxisbottommargin">bottom:</label>
+  						<input type="text" name="xaxisbottommargin" id="xaxisbottommargin" maxlength=5 size=5 min=0 max = 768 value=0>
+			    	</td>
+			  	</tr>
+			</table>
+  		</div>
+  		<!-- <div style="clear:both;">&nbsp;</div> -->
+  		<div >
+  			<h4> create yAxis ? </h4>
+  			<form action="">
+  				<input type="radio" name="yAxisType" value="none" onclick="hideElem('yaxismargins');"> NO<br>
+		  		<input type="radio" name="yAxisType" value="default" onclick="hideElem('yaxismargins');setTextInp('yaxisleftmargin',0);setTextInp('yaxisbottommargin',0)"> yes, with default margins (axis starts from bottom left corner of first bar)<br>
+		  		<input type="radio" name="yAxisType" value="custom" onclick="unhideElem('yaxismargins');" > yes, with custom margins (relative to bottom left of container, 0 means default)<br>
+			</form>
+  			<table id='yaxismargins' name='yaxismargins'>
+			  	<tr>
+			    	<td>
+			    		<label for="yaxisleftmargin">left:</label>
+						<input type="text" name="yaxisleftmargin" id="yaxisleftmargin" maxlength=5 size=5 min=0 max = 1024 value=0>
+			    	</td>
+			    	<td>
+			    		<label for="yaxisbottommargin">bottom:</label>
+  						<input type="text" name="yaxisbottommargin" id="yaxisbottommargin" maxlength=5 size=5 min=0 max = 768 value=0>
+			    	</td>
+			  	</tr>
+			</table>
+  		</div>
+  		<div >
+  			<h4> create Bar-Tips ? </h4>
+  			<form action="">
+			  <input type="radio" name="barTipsType" value="none" onclick="hideElem('barTipsOpts');setTextInp('barTipsRad',0);setTextInp('barTipsPos',0);"> NO<br>
+			  <input type="radio" name="barTipsType" value="default" onclick="hideElem('barTipsOpts');setTextInp('barTipsRad',0);setTextInp('barTipsPos',0);"> yes, at default places<br>
+			  <input type="radio" name="barTipsType" value="custom" onclick="unhideElem('barTipsOpts');" > yes, with custom radius, position (in Fraction of barWidth, 0 means default)<br>
+			</form>
+  			<table id='barTipsOpts'>
+			  	<tr>
+			    	<td>
+			    		<label for="barTipsRad">diameter:</label>
+						<input type="text" name="barTipsRad" id="barTipsRad" maxlength=5 size=5 min=0 max = 1024 value=0>
+			    	</td>
+			    	<td>
+			    		<label for="yaxisbottommargin">position:</label>
+  						<input type="text" name="barTipsPos" id="barTipsPos" maxlength=5 size=5 min=0 max = 768 value=0>
+			    	</td>
+			  	</tr>
+			</table>
+  		</div>
+  		<div >
+  			<h4> Create Line connecting top edge of bars ? </h4>
+  			<form action="">
+			  <input type="radio" name="lineType" value="none" onclick="hideElem('lineOpts');setTextInp('linePos',0); deselectCheckbox('lineArea');"> NO<br>
+			  <input type="radio" name="lineType" value="default" onclick="hideElem('lineOpts');setTextInp('linePos',0);deselectCheckbox('lineArea');"> yes, default (line connects mid points, without shade)<br>
+			  <input type="radio" name="lineType" value="custom" onclick="unhideElem('lineOpts');" > yes, connecting points at defined places <br>
+			</form>
+  			<table id='lineOpts'>
+			  	<tr>
+			    	<td>
+			    		<label for="linePos">position (Fraction of barWidth, 0 means default):</label>
+						<input type="text" name="linePos" id="linePos" maxlength=5 size=5 min=0 max = 1024 value=0>
+			    	</td>
+			    	<td>
+			    		<label for="lineArea">shade the area below line ?</label>
+			    		<input type="checkbox" id="lineArea" name="lineArea">
+			    	</td>
+			  	</tr>
+			</table>
+  		</div>
+  		<div >
+  			<h4> Color bars randomly ? </h4>
+  			<form >
+			  <input type="checkbox" id = "multiColorType" name="multiColorType" value="custom" > 
+			</form>
+  		</div>
+  		<div >
+  			<h4> Components will be drawn in following order, change it to control appearance of overlapping components(eg. area and bars) </h4>
+  			<form >
+			  	<label for="drawables">order of drawing components:</label>
+				<input type="text" name="drawables" id="drawables" value="">
+			</form>
+  		</div>
+  		<script type="text/javascript">
+  			document.getElementById("drawables").value = chart.getDrawables().join();
+  		</script>
+  		<div >
+  			<input type="submit" name="draw" value="draw it !" font-weight=700 onclick="drawChart();"><br>
+  		</div>
+  		<div name="barChartDiv" id="barChartDiv" >
+  			<p> bar chart will be drawn here</p>
+  		</div>
+  		
+	</body>
+</html>
